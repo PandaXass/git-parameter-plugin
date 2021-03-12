@@ -50,12 +50,16 @@ public class RevisionInfoFactory {
         return revisionInfoList;
     }
 
-    public String prettyRevisionInfo(Revision revision) {
+    private String prettyRevisionInfo(Revision revision) {
+        return prettyRevisionInfo(revision, this.gitClient);
+    }
+
+    public String prettyRevisionInfo(Revision revision, GitClient client) {
         String shortSha1 = revision.getSha1String().substring(0, 7);
 
         List<String> raw;
         try {
-            raw = gitClient.showRevision(revision.getSha1());
+            raw = client.showRevision(revision.getSha1());
         } catch (GitException | InterruptedException e1) {
             LOGGER.log(Level.SEVERE, Messages.GitParameterDefinition_unexpectedError(), e1);
             return shortSha1;
@@ -63,7 +67,7 @@ public class RevisionInfoFactory {
 
         String tag = null;
         try {
-            tag = gitClient.describe(revision.getSha1String());
+            tag = client.describe(revision.getSha1String());
             if (tag != null && tag.contains(shortSha1)) {
                 tag = null;
             }
