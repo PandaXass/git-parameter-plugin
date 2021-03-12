@@ -233,7 +233,8 @@ public class GitParameterDefinitionTest {
         project.addProperty(new ParametersDefinitionProperty(def));
 
         ItemsErrorModel items = def.getDescriptor().doFillValueItems(project, def.getName());
-        assertEquals("0.1", items.get(0).value);
+        String expected = "0.1 be702bf (0.1) 2011-10-31 23:05 Łukasz Miłkowski <lukanus@uaznia.net> [maven-release-plugin] prepare release 0.1";
+        assertEquals(expected, items.get(0).value);
     }
 
     @Test
@@ -273,7 +274,8 @@ public class GitParameterDefinitionTest {
         project.addProperty(new ParametersDefinitionProperty(def));
 
         ItemsErrorModel items = def.getDescriptor().doFillValueItems(project, def.getName());
-        assertEquals("0.1", items.get(items.size() - 1).value);
+        String expected = "0.1 be702bf (0.1) 2011-10-31 23:05 Łukasz Miłkowski <lukanus@uaznia.net> [maven-release-plugin] prepare release 0.1";
+        assertEquals(expected, items.get(items.size() - 1).value);
     }
 
     @Test
@@ -449,7 +451,9 @@ public class GitParameterDefinitionTest {
                 SortMode.ASCENDING, SelectedValue.TOP, null, false);
 
         project.addProperty(new ParametersDefinitionProperty(def));
-        assertEquals("0.1", def.getDefaultParameterValue().getValue());
+
+        String expected = "0.1 be702bf (0.1) 2011-10-31 23:05 Łukasz Miłkowski <lukanus@uaznia.net> [maven-release-plugin] prepare release 0.1";
+        assertEquals(expected, def.getDefaultParameterValue().getValue());
     }
 
     @Test

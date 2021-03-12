@@ -50,7 +50,7 @@ public class RevisionInfoFactory {
         return revisionInfoList;
     }
 
-    private String prettyRevisionInfo(Revision revision) {
+    public String prettyRevisionInfo(Revision revision) {
         String shortSha1 = revision.getSha1String().substring(0, 7);
 
         List<String> raw;

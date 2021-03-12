@@ -1,5 +1,6 @@
 package net.uaznia.lukanus.hudson.plugins.gitparameter;
 
+import hudson.plugins.git.Revision;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -350,12 +351,19 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
         try {
             Map<String, ObjectId> tags = gitClient.getRemoteReferences(gitUrl, tagFilter, false, true);
             for (String tagName : tags.keySet()) {
-                tagSet.add(tagName.replaceFirst(REFS_TAGS_PATTERN, ""));
+                tagSet.add(tagName.replaceFirst(REFS_TAGS_PATTERN, "")
+                               + " " + toTagWithRevision(tags.get(tagName), gitClient));
             }
         } catch (GitException e) {
             LOGGER.log(Level.WARNING, getCustomeJobName() + " " + Messages.GitParameterDefinition_getTag(), e);
         }
         return tagSet;
+    }
+
+    private String toTagWithRevision(ObjectId objectId, GitClient gitClient) {
+        RevisionInfoFactory revisionInfoFactory = new RevisionInfoFactory(gitClient, branch);
+        Revision revision = new Revision(objectId);
+        return revisionInfoFactory.prettyRevisionInfo(revision);
     }
 
     private Set<String> getBranch(GitClient gitClient, String gitUrl, String remoteName) throws Exception {
