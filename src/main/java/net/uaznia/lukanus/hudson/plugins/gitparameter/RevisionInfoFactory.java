@@ -51,15 +51,11 @@ public class RevisionInfoFactory {
     }
 
     private String prettyRevisionInfo(Revision revision) {
-        return prettyRevisionInfo(revision, this.gitClient);
-    }
-
-    public String prettyRevisionInfo(Revision revision, GitClient client) {
         String shortSha1 = revision.getSha1String().substring(0, 7);
 
         List<String> raw;
         try {
-            raw = client.showRevision(revision.getSha1());
+            raw = gitClient.showRevision(revision.getSha1());
         } catch (GitException | InterruptedException e1) {
             LOGGER.log(Level.SEVERE, Messages.GitParameterDefinition_unexpectedError(), e1);
             return shortSha1;
@@ -67,7 +63,7 @@ public class RevisionInfoFactory {
 
         String tag = null;
         try {
-            tag = client.describe(revision.getSha1String());
+            tag = gitClient.describe(revision.getSha1String());
             if (tag != null && tag.contains(shortSha1)) {
                 tag = null;
             }
@@ -100,6 +96,40 @@ public class RevisionInfoFactory {
             } else {
                 return StringUtils.join(new Object[]{shortSha1, String.format("(%s)", tag), date, author, commitMessage}, " ").trim();
             }
+        }
+
+        LOGGER.log(Level.WARNING, Messages.GitParameterDefinition_notFindAuthorPattern(authorLine));
+        return shortSha1;
+    }
+
+    public String prettyRevisionInfo(Revision revision, GitClient client) {
+        String shortSha1 = revision.getSha1String().substring(0, 7);
+
+        List<String> raw;
+        try {
+            raw = client.showRevision(revision.getSha1());
+        } catch (GitException | InterruptedException e1) {
+            LOGGER.log(Level.SEVERE, Messages.GitParameterDefinition_unexpectedError(), e1);
+            return shortSha1;
+        }
+
+        String commitMessage = trimMessage(getCommitMessage(raw));
+        String authorLine = getAuthorLine(raw);
+        Matcher matcher = AUTHOR_LINE_PATTERN.matcher(authorLine);
+        if (matcher.find()) {
+            String author = matcher.group(1);
+            String timestamp = matcher.group(2);
+            String zone = matcher.group(3);
+            DateTime date = new DateTime(parseLong(timestamp) * 1000, forID(zone)); //Convert UNIX timestamp to date
+            String stringDate = date.toString("yyyy-MM-dd HH:mm");
+            return StringUtils.join(new Object[]{shortSha1, stringDate, author, commitMessage}, " ").trim();
+        }
+
+        matcher = AUTHOR_LINE_PATTERN_GENERAL_DATE.matcher(authorLine);
+        if (matcher.find()) {
+            String author = matcher.group(1);
+            String date = matcher.group(2);
+            return StringUtils.join(new Object[]{shortSha1, date, author, commitMessage}, " ").trim();
         }
 
         LOGGER.log(Level.WARNING, Messages.GitParameterDefinition_notFindAuthorPattern(authorLine));
