@@ -494,7 +494,7 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
                 }
                 concatList.addAll(rcList);
                 concatList.addAll(releaseList);
-                concatList.addAll(otherList)
+                concatList.addAll(otherList);
                 return concatList;
             }
         } else {
