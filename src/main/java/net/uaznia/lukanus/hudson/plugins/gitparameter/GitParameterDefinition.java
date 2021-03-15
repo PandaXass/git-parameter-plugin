@@ -36,6 +36,8 @@ import hudson.model.TopLevelItem;
 import hudson.plugins.git.GitException;
 import hudson.plugins.git.GitSCM;
 import hudson.util.FormValidation;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -474,10 +476,31 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
             if (this.getSortMode().getIsDescending()) {
                 Collections.reverse(sorted);
             }
+            if (this.getSortMode().equals(SortMode.RC_THEN_RELEASE)) {
+                Collections.reverse(sorted);
+                ArrayList<String> rcList = new ArrayList<>();
+                ArrayList<String> releaseList = new ArrayList<>();
+                ArrayList<String> concatList = new ArrayList<>();
+
+                for (String tag : sorted) {
+                    if (tag.startsWith("rc")) {
+                        rcList.add(tag);
+                    } else if (tag.startsWith("release")) {
+                        releaseList.add(tag);
+                    }
+                }
+                concatList.addAll(rcList);
+                concatList.addAll(releaseList);
+                return concatList;
+            }
         } else {
             sorted = new ArrayList<>(toSort);
         }
         return sorted;
+    }
+
+    boolean startsWith(String pattern, String str) {
+        return str.startsWith(pattern);
     }
 
     private FilePathWrapper getWorkspace(JobWrapper jobWrapper, boolean isRepoScm) throws IOException, InterruptedException {
