@@ -371,7 +371,6 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
         Set<String> tagSet = new HashSet<String>();
         try {
             Map<String, ObjectId> tags = gitClient.getRemoteReferences(gitUrl, tagFilter, false, true);
-            //Map.Entry<String, ObjectId> tagEntry : tags.entrySet()
             for (Map.Entry<String, ObjectId> tagEntry : tags.entrySet()) {
                 tagSet.add(tagEntry.getKey().replaceFirst(REFS_TAGS_PATTERN, "")
                                + " " + toTagWithRevision(tagEntry.getValue(), gitClient));
