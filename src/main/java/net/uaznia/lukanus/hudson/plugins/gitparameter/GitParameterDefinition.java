@@ -480,6 +480,7 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
                 Collections.reverse(sorted);
                 ArrayList<String> rcList = new ArrayList<>();
                 ArrayList<String> releaseList = new ArrayList<>();
+                ArrayList<String> otherList = new ArrayList<>();
                 ArrayList<String> concatList = new ArrayList<>();
 
                 for (String tag : sorted) {
@@ -487,10 +488,13 @@ public class GitParameterDefinition extends ParameterDefinition implements Compa
                         rcList.add(tag);
                     } else if (tag.startsWith("release")) {
                         releaseList.add(tag);
+                    } else {
+                        otherList.add(tag);
                     }
                 }
                 concatList.addAll(rcList);
                 concatList.addAll(releaseList);
+                concatList.addAll(otherList)
                 return concatList;
             }
         } else {
